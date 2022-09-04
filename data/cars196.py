@@ -2,7 +2,7 @@ import os.path
 import random
 from scipy.io import loadmat
 
-from dataset import Dataset
+from .dataset import Dataset
 
 
 class Cars196(Dataset):
@@ -10,7 +10,7 @@ class Cars196(Dataset):
         self.meta_file = 'cars_annos.mat'
         self.benchmark = benchmark
         super(Cars196, self).__init__(root, train, transform)
-        print "Loaded {} samples for dataset {},  {} classes, {} instances".format(len(self), self.name, self.num_cls, self.num_instance)
+        print(("Loaded {} samples for dataset {},  {} classes, {} instances".format(len(self), self.name, self.num_cls, self.num_instance)))
 
     @property
     def name(self):
@@ -76,7 +76,7 @@ class Cars196(Dataset):
             # split the classes into 50:50 train:test split
 
             num_total_classes = meta_data['class_names'].size
-            shuffled_idxs = range(num_total_classes)
+            shuffled_idxs = list(range(num_total_classes))
 
             if not benchmark:
                 import random
@@ -104,24 +104,24 @@ class Cars196(Dataset):
 if __name__ == '__main__':
 
     cars196_train_set = Cars196('/data1/data/cars196')
-    print "Loaded {} samples for dataset {}".format(len(cars196_train_set), cars196_train_set.name)
-    for i in random.sample(range(0,len(cars196_train_set)), 5):
+    print(("Loaded {} samples for dataset {}".format(len(cars196_train_set), cars196_train_set.name)))
+    for i in random.sample(list(range(0,len(cars196_train_set))), 5):
         image_id, class_id, instance_id = cars196_train_set[i]
-        print "Image  {} has label {}, name {}, label {}, name {}".format(cars196_train_set.image_paths[i], instance_id,
+        print(("Image  {} has label {}, name {}, label {}, name {}".format(cars196_train_set.image_paths[i], instance_id,
                                                                           cars196_train_set.instance_names[instance_id],
                                                                           class_id,
-                                                                          cars196_train_set.class_names[class_id])
+                                                                          cars196_train_set.class_names[class_id])))
 
     cars196_test_set = Cars196('/data1/data/cars196', train=False)
-    print "Loaded {} samples for dataset {}".format(len(cars196_test_set), cars196_test_set.name)
+    print(("Loaded {} samples for dataset {}".format(len(cars196_test_set), cars196_test_set.name)))
     for i in [2022, 1668, 2041, 1710, 2233, 2160, 3970, 3800]:
     # for i in random.sample(range(0,len(cars196_train_set)), 5):
         image_id, class_id, instance_id = cars196_test_set[i]
 
-        print "Image  {} has label {}, name {}, label {}, name {}".format(cars196_test_set.image_paths[i], instance_id,
+        print(("Image  {} has label {}, name {}, label {}, name {}".format(cars196_test_set.image_paths[i], instance_id,
                                                                       cars196_test_set.instance_names[instance_id],
-                                                                      class_id, cars196_test_set.class_names[class_id])
+                                                                      class_id, cars196_test_set.class_names[class_id])))
 
     for i, c in enumerate(cars196_test_set.instance2class):
-        print "Instace name {} has class name {}".format(cars196_test_set.instance_names[i],
-                                                         cars196_test_set.class_names[c])
+        print(("Instace name {} has class name {}".format(cars196_test_set.instance_names[i],
+                                                         cars196_test_set.class_names[c])))

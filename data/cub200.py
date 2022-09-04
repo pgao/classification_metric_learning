@@ -2,7 +2,7 @@ import os.path
 import random
 import csv
 
-from dataset import Dataset
+from .dataset import Dataset
 
 
 class Cub200(Dataset):
@@ -12,7 +12,7 @@ class Cub200(Dataset):
         self.class_name_file = os.path.join(root, 'classes.txt')
         self.benchmark = benchmark
         super(Cub200, self).__init__(root, train, transform)
-        print "Loaded {} samples for dataset {},  {} classes, {} instances".format(len(self), self.name, self.num_cls, self.num_instance)
+        print(("Loaded {} samples for dataset {},  {} classes, {} instances".format(len(self), self.name, self.num_cls, self.num_instance)))
 
     @property
     def name(self):
@@ -41,7 +41,7 @@ class Cub200(Dataset):
         self.class_map = {}
         self.instance_map = {}
 
-        for image_id, instance_id in meta_data['id2cls'].items():
+        for image_id, instance_id in list(meta_data['id2cls'].items()):
 
             if str(instance_id) not in instance_id_to_load:
                 continue
@@ -90,7 +90,7 @@ class Cub200(Dataset):
             # split the classes into 50:50 train:test split
 
             num_total_classes = len(meta_data['class_names'])
-            shuffled_idxs = range(num_total_classes)
+            shuffled_idxs = list(range(num_total_classes))
 
             if not benchmark:
                 import random
@@ -120,12 +120,12 @@ class Cub200(Dataset):
 if __name__ == '__main__':
 
     train_set = Cub200('/data1/data/cub200/CUB_200_2011')
-    for i in random.sample(range(0,len(train_set)), 5):
+    for i in random.sample(list(range(0,len(train_set))), 5):
         image_id, class_id, instance_id = train_set[i]
-        print "Image  {} has label {}, name {}".format(train_set.image_paths[i], instance_id, train_set.instance_names[instance_id])
+        print(("Image  {} has label {}, name {}".format(train_set.image_paths[i], instance_id, train_set.instance_names[instance_id])))
 
     test_set = Cub200('/data1/data/cub200/CUB_200_2011', train=False)
-    for i in random.sample(range(0,len(test_set)), 5):
+    for i in random.sample(list(range(0,len(test_set))), 5):
         image_id, class_id, instance_id = test_set[i]
-        print "Image  {} has label {}, name {}".format(test_set.image_paths[i], instance_id, test_set.instance_names[instance_id])
+        print(("Image  {} has label {}, name {}".format(test_set.image_paths[i], instance_id, test_set.instance_names[instance_id])))
 

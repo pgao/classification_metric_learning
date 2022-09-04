@@ -1,8 +1,8 @@
 # coding=utf-8
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+
+
+
 
 import sys
 
@@ -12,9 +12,7 @@ import torch
 
 class SimpleLogger(object):
     def __init__(self, logfile, terminal):
-        ZERO_BUFFER_SIZE = 0  # immediately flush logs
-
-        self.log = open(logfile, 'a', ZERO_BUFFER_SIZE)
+        self.log = open(logfile, 'a')
         self.terminal = terminal
 
     def write(self, message):

@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from PIL import Image
 
-class Dataset(object):
+class Dataset(object, metaclass=ABCMeta):
     """
     This abstract class defines the interface needed for dataset loading
     All concrete subclasses need to implement the following method/property:
@@ -16,8 +16,6 @@ class Dataset(object):
         self.class_labels = []
         self.instance_labels = []
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, root, train=True, transform=None):
         self.root = root

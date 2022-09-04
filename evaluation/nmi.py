@@ -32,7 +32,7 @@ def test_nmi(embeddings, labels, output_file):
 
     nmi = normalized_mutual_info_score(kmeans.labels_, labels)
 
-    print("NMI: {}".format(nmi))
+    print(("NMI: {}".format(nmi)))
     return nmi
 
 
@@ -59,7 +59,7 @@ def test_nmi_faiss(embeddings, labels):
 
     nmi = normalized_mutual_info_score(labels, pred_labels)
 
-    print("NMI: {}".format(nmi))
+    print(("NMI: {}".format(nmi)))
     return nmi
 
 

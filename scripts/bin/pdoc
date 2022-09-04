@@ -54,7 +54,8 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 DEFAULT_DOCKERFILE="$(dirname $(${READLINK} -f $0))/Dockerfile"
 DOCKERFILE=$DEFAULT_DOCKERFILE
-RUN_LOCAL=0
+# RUN_LOCAL=0
+RUN_LOCAL=1
 
 while getopts "h?ld:" opt; do
     case "$opt" in
@@ -143,6 +144,8 @@ if [ $DOCKER_IMAGE = $PROD_IMAGE ] && [ $RUN_LOCAL -eq 0 ]; then
   echo "Pulling docker image version ${PROD_VERSION}"
   docker pull $DOCKER_IMAGE
 fi
+
+sudo cp -r /home/pgao/aquarium_hackathon_2022/data/label_crops/ /data1/data/aquarium/
 
 # run inside bash to allow ^C handling correctly
 # https://github.com/bodil/pulp/issues/87

@@ -1,5 +1,7 @@
 import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import time
 from itertools import chain
@@ -17,6 +19,7 @@ from data.inshop import InShop
 from data.stanford_products import StanfordOnlineProducts
 from data.cars196 import Cars196
 from data.cub200 import Cub200
+from data.aquarium import Aquarium
 from metric_learning.util import SimpleLogger
 from metric_learning.sampler import ClassBalancedBatchSampler
 
@@ -61,7 +64,7 @@ def adjust_learning_rate(optimizer, epoch, epochs_per_step, gamma=0.1):
     if epoch != 0 and epoch % epochs_per_step == 0:
         for param_group in optimizer.param_groups:
             param_group['lr'] *= gamma
-            print("learning rate adjusted: {}".format(param_group['lr']))
+            print(("learning rate adjusted: {}".format(param_group['lr'])))
 
 
 def main():
@@ -116,8 +119,13 @@ def main():
         train_dataset = InShop('/data1/data/inshop', transform=train_transform)
         query_dataset = InShop('/data1/data/inshop', train=False, query=True, transform=eval_transform)
         index_dataset = InShop('/data1/data/inshop', train=False, query=False, transform=eval_transform)
+    elif args.dataset == 'Aquarium':
+        # train_dataset = Aquarium('/data1/data/aquarium/', transform=train_transform)
+        # eval_dataset = Aquarium('/data1/data/aquarium/', train=False, transform=eval_transform)
+        train_dataset = Aquarium('/home/pgao/aquarium_hackathon_2022/data/label_crops', transform=train_transform)
+        eval_dataset = Aquarium('/home/pgao/aquarium_hackathon_2022/data/label_crops', train=False, transform=eval_transform)
     else:
-        print("Dataset {} is not supported yet... Abort".format(args.dataset))
+        print(("Dataset {} is not supported yet... Abort".format(args.dataset)))
         return
 
     # Setup dataset loader
@@ -166,10 +174,16 @@ def main():
     # Training mode
     model.train()
 
+    # Load existing weights if available
+    # model.load_state_dict(torch.load(model_path))
+
     # Start with pretraining where we finetune only new parameters to warm up
     opt = torch.optim.SGD(list(loss_fn.parameters()) + list(set(model.parameters()) -
                                                             set(model.feature.parameters())),
                           lr=args.lr * args.lr_mult, momentum=0.9, weight_decay=1e-4)
+    # opt = torch.optim.Adam(list(loss_fn.parameters()) + list(set(model.parameters()) -
+    #                                                         set(model.feature.parameters())),
+    #                         lr=args.lr * args.lr_mult, weight_decay=1e-4)
 
     log_every_n_step = 10
     for epoch in range(args.pretrain_epochs):
@@ -191,11 +205,11 @@ def main():
             end = time.time()
 
             if (i + 1) % log_every_n_step == 0:
-                print('Epoch {}, LR {}, Iteration {} / {}:\t{}'.format(
-                    args.pretrain_epochs - epoch, opt.param_groups[0]['lr'], i, len(train_loader), loss.item()))
+                print(('Epoch {}, LR {}, Iteration {} / {}:\t{}'.format(
+                    args.pretrain_epochs - epoch, opt.param_groups[0]['lr'], i, len(train_loader), loss.item())))
 
-                print('Data: {}\tForward: {}\tBackward: {}\tBatch: {}'.format(
-                    forward - data, back - forward, end - back, end - forward))
+                print(('Data: {}\tForward: {}\tBackward: {}\tBatch: {}'.format(
+                    forward - data, back - forward, end - back, end - forward)))
 
         eval_file = os.path.join(output_directory, 'epoch_{}'.format(args.pretrain_epochs - epoch))
         if args.dataset != "InShop":
@@ -209,9 +223,10 @@ def main():
 
     # Full end-to-end finetune of all parameters
     opt = torch.optim.SGD(chain(model.parameters(), loss_fn.parameters()), lr=args.lr, momentum=0.9, weight_decay=1e-4)
+    # opt = torch.optim.Adam(chain(model.parameters(), loss_fn.parameters()), lr=args.lr, weight_decay=1e-4)
 
     for epoch in range(args.epochs_per_step * args.num_steps):
-        print('Output Directory: {}'.format(output_directory))
+        print(('Output Directory: {}'.format(output_directory)))
         adjust_learning_rate(opt, epoch, args.epochs_per_step, gamma=args.gamma)
 
         for i, (im, _, instance_label, index) in enumerate(train_loader):
@@ -233,10 +248,10 @@ def main():
             end = time.time()
 
             if (i + 1) % log_every_n_step == 0:
-                print('Epoch {}, LR {}, Iteration {} / {}:\t{}'.format(
-                    epoch, opt.param_groups[0]['lr'], i, len(train_loader), loss.item()))
-                print('Data: {}\tForward: {}\tBackward: {}\tBatch: {}'.format(
-                    forward - data, back - forward, end - back, end - data))
+                print(('Epoch {}, LR {}, Iteration {} / {}:\t{}'.format(
+                    epoch, opt.param_groups[0]['lr'], i, len(train_loader), loss.item())))
+                print(('Data: {}\tForward: {}\tBackward: {}\tBatch: {}'.format(
+                    forward - data, back - forward, end - back, end - data)))
 
         snapshot_path = os.path.join(output_directory, 'epoch_{}.pth'.format(epoch + 1))
         torch.save(model.state_dict(), snapshot_path)

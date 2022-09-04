@@ -22,12 +22,12 @@ def extract_feature(model, loader, gpu_device):
             all_labels.extend(instance_label.tolist())
 
             if (i + 1) % log_every_n_step == 0:
-                print('Process Iteration {} / {}:'.format(i, len(loader)))
+                print(('Process Iteration {} / {}:'.format(i, len(loader))))
 
     all_embeddings = np.vstack(all_embeddings)
 
-    print("Generated {} embedding matrix".format(all_embeddings.shape))
-    print("Generate {} labels".format(len(all_labels)))
+    print(("Generated {} embedding matrix".format(all_embeddings.shape)))
+    print(("Generate {} labels".format(len(all_labels))))
 
     model.train()
     return all_embeddings, all_labels

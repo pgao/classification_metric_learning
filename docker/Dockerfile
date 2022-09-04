@@ -47,7 +47,9 @@ RUN apt-get -q -y update && apt-get install --force-yes -q -y \
         libnccl2=2.2.12-1+cuda9.1 \
         libnccl-dev=2.2.12-1+cuda9.1
 
-RUN easy_install pip
+# RUN easy_install pip
+RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py -o get-pip.py
+RUN python get-pip.py
 RUN pip install \
     pip==9.0.1 \
     h5py==2.7.0
@@ -81,7 +83,8 @@ ENV VISION_ROOT=/opt/vision
 COPY third_party/vision $VISION_ROOT
 
 RUN cd $VISION_ROOT && \
-    python setup.py install
+    # python setup.py install
+    pip install -e .
 
 # faiss
 RUN apt-get install --force-yes -q -y libopenblas-dev
